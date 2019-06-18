@@ -1,8 +1,8 @@
 "use strict";
 
 // put your own value below!
-const apiKey = "0SOJv0wMquzXnxgWYVTW18Sq9WZPNmiCaWbD7ZjZ";
-const searchURL = "https://developer.nps.gov/api/v1/parks";
+const apiKey = "";
+const searchURL = "";
 
 function formatQueryParams(params) {
     const queryItems = Object.keys(params).map(
