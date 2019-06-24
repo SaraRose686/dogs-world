@@ -6,20 +6,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>It's a Dogs' World</title>
     <link rel="stylesheet" href="index.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous" defer></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js" defer></script>
+    <script src="https://unpkg.com/@petfinder/petfinder-js/dist/petfinder.min.js" defer></script>
+    <script src="index.js" defer></script>
 </head>
 <body>
     <div class="container">
         <h1>It's a Dogs' World</h1>
 
-        <!-- <form id="js-form">
-            <label for="search-state">Select State:</label>
-            
-            <label for="max-results">Maximum results to return:</label>
-            <input type="number" name="max-results" id="js-max-results" value="10" min="10" max="50">
-            <br>
+        <form id="js-form">
+            <input type="text" name="zipcode" id="js-zipcode" placeholder="Enter zipcode">
             <input type="submit" value="Search">
-        </form> -->
+        </form>
 
         <p id="js-error-message" class="error-message"></p>
         <section id="results" class="hidden">
@@ -28,6 +29,6 @@
           </ul>
         </section>
     </div>
-    <script src="index.js"></script>
+    
 </body>
 </html>
