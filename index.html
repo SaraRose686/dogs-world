@@ -14,21 +14,23 @@
     <script src="index.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <h1>It's a Dogs' World</h1>
+    
+    <h1>It's a Dogs' World</h1>
 
-        <form id="js-form">
-            <input type="text" name="zipcode" id="js-zipcode" placeholder="Enter zipcode">
-            <input type="submit" value="Search">
-        </form>
+    <form id="js-form">
+        <input type="text" name="zip-code" id="js-zip-code" required placeholder="Enter zip code" pattern="\d{5}"
+            title="Enter a five digit zip-code (e.g. 90210)." >
+        <input type="submit" value="Search">
+    </form>
 
-        <p id="js-error-message" class="error-message"></p>
-        <section id="results" class="hidden">
-          <h2>Search results</h2>
-          <ul id="results-list">
-          </ul>
-        </section>
-    </div>
+    <p id="js-error-message" class="error-message"></p>
+
+    <section id="results" class="hidden">
+        <h2>Search results</h2>
+        <ul id="results-list">
+        </ul>
+    </section>
+
     
 </body>
 </html>

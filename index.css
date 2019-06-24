@@ -1,26 +1,26 @@
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
 }
 
 form > * {
-  margin: 5px;
+    margin: 5px;
 }
 
-button, input[type="text"] {
-  padding: 5px;
+button,
+input[type="text"] {
+    padding: 5px;
 }
 
 button:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
+input[type="text"] {
+    width: 100px;
 }
 
 .error-message {
@@ -28,5 +28,5 @@ button:hover {
 }
 
 .hidden {
-  display: none;
+    display: none;
 }
