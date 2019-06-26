@@ -17,9 +17,43 @@
     
     <h1>It's a Dogs' World</h1>
 
-    <form id="js-form">
-        <input type="text" name="zip-code" id="js-zip-code" required placeholder="Enter zip code" pattern="\d{5}"
+    <form class="searchForm" id="js-form">
+        <input type="text" class="js-zip-code" id="js-zip-code" required placeholder="Enter zip code" pattern="\d{5}"
             title="Enter a five digit zip-code (e.g. 90210)." >
+        <fieldset class="additionalSearch hidden" >
+            <legend>Additional Filters</legend>
+            <label>Gender</label><br>
+            <input type="checkbox" class="js-gender" id="gender-m" value="male">
+            <label for="gender-m">Male</label>
+            <input type="checkbox" class="js-gender" id="gender-f" value="female">
+            <label for="gender-f">Female</label>
+            <br>
+            <label>Age</label><br>
+            <input type="checkbox" class="js-age" id="age-p" value="baby">
+            <label for="age-p">Puppy</label>
+            <input type="checkbox" class="js-age" id="age-y" value="young">
+            <label for="age-y">Young</label>
+            <input type="checkbox" class="js-age" id="age-a" value="adult">
+            <label for="age-a">Adult</label>
+            <input type="checkbox" class="js-age" id="age-s" value="senior">
+            <label for="age-s">Senior</label>
+            <br>
+            <label>Size</label><br>
+            <input type="checkbox" class="js-size" id="size-s" value="small">
+            <label for="size-s">Small</label>
+            <input type="checkbox" class="js-size" id="size-m" value="medium">
+            <label for="size-m">Medium</label>
+            <input type="checkbox" class="js-size" id="size-l" value="large">
+            <label for="size-l">Large</label>
+            <input type="checkbox" class="js-size" id="size-xl" value="xlarge">
+            <label for="size-xl">X-Large</label>
+            <br>
+            <label>Caretaker</label><br>
+            <input type="checkbox" class="js-caretaker" id="caretaker-o" value="getYourPet">
+            <label for="caretaker-o">Owner</label>
+            <input type="checkbox" class="js-caretaker" id="caretaker-s" value="petfinder">
+            <label for="caretaker-s">Shelter/Rescue</label>
+        </fieldset>
         <input type="submit" value="Search">
     </form>
 
