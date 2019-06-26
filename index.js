@@ -8,8 +8,8 @@ const dogOptions = {
         senior: "Senior (over 7 years old)"
     },
     caretaker: {
-        petfinder: "Shelter/Rescue",
-        getYourPet: "Owner"
+        petfinder: ["Shelter/Rescue", "petfinder"],
+        getYourPet: ["Owner", "getYourPet"]
     },
     size: {
         small: "Small",
@@ -32,6 +32,12 @@ const dogOptions = {
 
 const api = {
     results: [],
+    pagination: {
+        totalPages: 1,
+        currentPage: 1,
+        totalCount: 0,
+        currentCount: 0
+    },
     petfinder: {
         displaySearch: true,
         client: new petfinder.Client( { // Petfinder JS SDK client to perform API calls
@@ -41,7 +47,7 @@ const api = {
             type: "Dog",
             status: "adoptable",
             location: "95814",
-            distance: 25,
+            distance: 10,
             sort: "distance",
             page: 1,
             limit: 26,
@@ -61,7 +67,7 @@ const api = {
             params: {
                 PetType: "dog",
                 ZipCode: "95814",
-                SearchRadiusInMiles: 25,
+                SearchRadiusInMiles: 10,
                 PageNumber: 1,
                 OrderBy: "distance",
             }
@@ -69,11 +75,95 @@ const api = {
     }
 };
 
-function formatQueryParams(params) {
-    const queryItems = Object.keys(params).map(
-        key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`
+function displayDetails( petId, petIndex ) {
+    let dog = api.results[petIndex];
+    $(`#${petId} table`).html(`
+        <tr><th>Breed<th><td>${dog.breed}<td><tr>
+        <tr><th>Gender<th><td>${dog.gender}<td><tr>
+        <tr><th>Age<th><td>${dog.age}<td><tr>
+        <tr><th>Size<th><td>${dog.size}<td><tr>
+        <tr><th>Good With<th><td>${dog.goodWith}<td><tr>
+        <tr><th>Story<th><td>${dog.story}<td><tr>
+        <tr><th>Caretaker<th><td>${dog.caretaker[0]}<td><tr>
+        <tr><th>City, State<th><td>${dog.cityState}<td><tr>
+        <tr><th>More about ${dog.name}<th><td><a href="${dog.url}" target="_blank">Click Here</a><td><tr>
+        
+        `
     );
-    return queryItems.join("&");
+}
+
+function processPetFinderDetails( responseJson ) {
+    const pet = responseJson.data.animal;
+    const petIndex = api.results.findIndex( dog => dog.id === pet.id );
+    let dog = api.results[petIndex];
+    dog.breed = pet.breeds.primary;
+    dog.gender = pet.gender;
+    dog.age = pet.age === "Baby" ? dogOptions.age.puppy : 
+            ( pet.age === "Young" ? dogOptions.age.young : 
+            ( pet.age === "Senior" ? dogOptions.age.senior : dogOptions.age.adult ) );
+    dog.size = pet.size === "Small" ? dogOptions.size.small : 
+            ( pet.size === "Medium" ? dogOptions.size.medium : 
+            ( pet.size === "Large" ? dogOptions.size.large : dogOptions.size.xlarge ) );
+    dog.cityState = pet.contact.address.city + ", " + pet.contact.address.state;
+    let goodWithList = [];
+    Object.entries(pet.environment).forEach(([key, value]) => {
+        if(value) {
+            goodWithList.push(key);
+        }
+    });
+    dog.goodWith = goodWithList.join(", ");
+    dog.story = pet.description; 
+    dog.url = pet.url;
+    
+    console.log(pet);
+    console.log(dog);
+    displayDetails( dog.id + '_' + dog.caretaker[1], petIndex );
+}
+
+function processGetYourPetDetails( pet ) {
+    const petIndex = api.results.findIndex( dog => dog.id === pet.PetId );
+    let dog = api.results[petIndex];
+    dog.breed = pet.BreedsForDisplay;
+    dog.gender = pet.Gender;
+    dog.age = pet.AgeYears === 0 ? dogOptions.age.puppy : 
+            ( pet.AgeYears === 1 ? dogOptions.age.young : 
+            ( pet.AgeYears > 6 ? dogOptions.age.senior : dogOptions.age.adult ) );
+    dog.size = pet.Size === "s (11lbs. to 20lbs.)" || pet.Size === "xs (10lbs. or less)" ? dogOptions.size.small :
+            ( pet.Size === "m (21lbs. to 40lbs.)" ? dogOptions.size.medium : 
+            ( pet.Size === "xl (over 75lbs.)" ? dogOptions.size.xlarge : dogOptions.size.large ) );
+    dog.cityState = pet.City + ", " + pet.State;
+    dog.goodWith = pet.GoodWith.join(", ");
+    dog.story = pet.Story;
+    dog.url = pet.ProfileUrl;
+    
+    console.log(pet);
+    console.log(dog);
+    displayDetails( dog.id + '_' + dog.caretaker[1], petIndex );
+}
+
+function getPetDetails( id, source ){
+    if( source === dogOptions.caretaker.getYourPet[1] ) {
+        const url = api.getYourPet.search.url + "/" + id + "?" + 
+            "zipCode=" + api.getYourPet.search.params.ZipCode;
+        fetch(url)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(response.statusText);
+            })
+            .then(responseJson => processGetYourPetDetails(responseJson))
+            .catch(err => {
+                $("#js-error-message").text(`Something went wrong: ${err.message}`);
+        });
+    }
+    else if( source === dogOptions.caretaker.petfinder[1] ) {
+        api.petfinder.client.animal.show(id)
+            .then(responseJson => processPetFinderDetails(responseJson))
+            .catch(err => {
+                $("#js-error-message").text(`Something went wrong: ${err.message}`);
+        });
+    }
 }
 
 function displayResults() {
@@ -83,15 +173,13 @@ function displayResults() {
 
     //iterate through the items array
     for (let i = 0; i < api.results.length; i++) {
-        // for each park in the data
-        //array, add a list item to the results
-        //list with the park name, description,
-        //and url
         $("#results-list").append(
-            `<li>
-                <h3>${api.results[i].name}</h3>
+            `<li id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
+                <a onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" href="javascript:void(0);">
+                    <h3>${api.results[i].name}</h3>
+                </a>
                 <img src='${api.results[i].photoURL}' alt='Picture of ${api.results[i].name}'>
-                <button>View Details</button>
+                <table></table>
             </li>`
         );
     }
@@ -102,22 +190,12 @@ function displayResults() {
 }
 
 function processPetFinderResults( responseJson ) {
-    responseJson.data.animals.forEach( pet => api.results.push({
+    responseJson.data.animals.forEach( pet => api.results.push( {
         caretaker: dogOptions.caretaker.petfinder,
         id: pet.id,
         name: pet.name,
-        breed: pet.breeds.primary,
-        gender: pet.gender,
-        age:  pet.age === "Baby" ? dogOptions.age.puppy : 
-            ( pet.age === "Young" ? dogOptions.age.young : 
-            ( pet.age === "Senior" ? dogOptions.age.senior : dogOptions.age.adult ) ),
-        size: pet.size === "Small" ? dogOptions.size.small : 
-            ( pet.size === "Medium" ? dogOptions.size.medium : 
-            ( pet.size === "Large" ? dogOptions.size.large : dogOptions.size.xlarge ) ),
         photoURL: pet.photos[0].medium
     }));
-        
-    console.log(responseJson.data.animals);
 }
 
 function processGetYourPetResults( responseJson ) {
@@ -125,18 +203,8 @@ function processGetYourPetResults( responseJson ) {
         caretaker: dogOptions.caretaker.getYourPet,
         id: pet.PetId,
         name: pet.Name,
-        breed: pet.BreedsForDisplay,
-        gender: pet.Gender,
-        age:  pet.AgeYears === 0 ? dogOptions.age.puppy : 
-            ( pet.AgeYears === 1 ? dogOptions.age.young : 
-            ( pet.AgeYears > 6 ? dogOptions.age.senior : dogOptions.age.adult ) ),
-        size: pet.Size === "s (11lbs. to 20lbs.)" || pet.Size === "xs (10lbs. or less)" ? dogOptions.size.small :
-            ( pet.Size === "m (21lbs. to 40lbs.)" ? dogOptions.size.medium : 
-            ( pet.Size === "xl (over 75lbs.)" ? dogOptions.size.xlarge : dogOptions.size.large ) ),
         photoURL: pet.PrimaryPhotoUrl
     }));
-        
-    console.log(responseJson);
 }
 
 function getPetList() {
