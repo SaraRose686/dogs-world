@@ -5,66 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>It's a Dogs' World</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" 
+        integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" 
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Atma:600|Open+Sans:400,700&display=swap" >
     <link rel="stylesheet" href="index.css">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
         crossorigin="anonymous" defer></script>
+    <script src="https://code.iconify.design/1/1.0.2/iconify.min.js" defer></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js" defer></script>
     <script src="https://unpkg.com/@petfinder/petfinder-js/dist/petfinder.min.js" defer></script>
     <script src="index.js" defer></script>
 </head>
 <body>
+    <header>
+        <h1>It's a Dogs' World</h1>
+        <h2>Find your new best friend now!</h2>
+    </header>
     
-    <h1>It's a Dogs' World</h1>
-
-    <form class="searchForm" id="js-form">
-        <input type="text" class="js-zip-code" id="js-zip-code" required placeholder="Enter zip code" pattern="\d{5}"
-            title="Enter a five digit zip-code (e.g. 90210)." >
-        <fieldset class="additionalSearch hidden" >
-            <legend>Additional Filters</legend>
-            <label>Gender</label><br>
-            <input type="checkbox" class="js-gender" id="gender-m" value="male">
-            <label for="gender-m">Male</label>
-            <input type="checkbox" class="js-gender" id="gender-f" value="female">
-            <label for="gender-f">Female</label>
-            <br>
-            <label>Age</label><br>
-            <input type="checkbox" class="js-age" id="age-p" value="baby">
-            <label for="age-p">Puppy</label>
-            <input type="checkbox" class="js-age" id="age-y" value="young">
-            <label for="age-y">Young</label>
-            <input type="checkbox" class="js-age" id="age-a" value="adult">
-            <label for="age-a">Adult</label>
-            <input type="checkbox" class="js-age" id="age-s" value="senior">
-            <label for="age-s">Senior</label>
-            <br>
-            <label>Size</label><br>
-            <input type="checkbox" class="js-size" id="size-s" value="small">
-            <label for="size-s">Small</label>
-            <input type="checkbox" class="js-size" id="size-m" value="medium">
-            <label for="size-m">Medium</label>
-            <input type="checkbox" class="js-size" id="size-l" value="large">
-            <label for="size-l">Large</label>
-            <input type="checkbox" class="js-size" id="size-xl" value="xlarge">
-            <label for="size-xl">X-Large</label>
-            <br>
-            <label>Caretaker</label><br>
-            <input type="checkbox" class="js-caretaker" id="caretaker-o" value="getYourPet">
-            <label for="caretaker-o">Owner</label>
-            <input type="checkbox" class="js-caretaker" id="caretaker-s" value="petfinder">
-            <label for="caretaker-s">Shelter/Rescue</label>
-        </fieldset>
-        <input type="submit" value="Search">
+    <form class="searchForm" id="js-form" >
+        <div class="searchLocation">
+            <span class="additionalSearch hidden">
+                Within <input type="number" class="distanceInput js-distance" min="10" max="500" required value="10"> miles of 
+            </span>
+            <input type="text" class="zipCodeInput js-zip-code" id="js-zip-code" 
+                required placeholder="Zip code" pattern="\d{5}" autocomplete="off"
+                title="Enter a five digit zip-code (e.g. 90210)." >   
+            <input type="submit" class="searchSubmit" value="Search">
+        </div>
+        <div class="searchFilters additionalSearch hidden" >
+            <div class="inputBoxGroup genderBox">
+                <h3>Gender:</h3>
+                <input type="checkbox" class="js-gender" id="gender-m" value="male">
+                <label for="gender-m">Male</label>
+                <input type="checkbox" class="js-gender" id="gender-f" value="female">
+                <label for="gender-f">Female</label>  
+            </div>
+            <div class="inputBoxGroup ageBox">
+                <h3>Age:</h3>
+                <input type="checkbox" class="js-age" id="age-p" value="baby">
+                <label for="age-p">Puppy</label>
+                <input type="checkbox" class="js-age" id="age-y" value="young">
+                <label for="age-y">Young</label>
+                <input type="checkbox" class="js-age" id="age-a" value="adult">
+                <label for="age-a">Adult</label>
+                <input type="checkbox" class="js-age" id="age-s" value="senior">
+                <label for="age-s">Senior</label>
+                
+            </div>
+            <div class="inputBoxGroup sizeBox">
+                <h3>Size:</h3>
+                <input type="checkbox" class="js-size" id="size-s" value="small">
+                <label for="size-s">Small</label>
+                <input type="checkbox" class="js-size" id="size-m" value="medium">
+                <label for="size-m">Medium</label>
+                <input type="checkbox" class="js-size" id="size-l" value="large">
+                <label for="size-l">Large</label>
+                <input type="checkbox" class="js-size" id="size-xl" value="xlarge">
+                <label for="size-xl">X-Large</label>
+                
+            </div>
+            <div class="inputBoxGroup caretakerBox">
+                <h3>Caretaker:</h3>
+                <input type="checkbox" class="js-caretaker" id="caretaker-o" value="getYourPet">
+                <label for="caretaker-o">Owner</label>
+                <input type="checkbox" class="js-caretaker" id="caretaker-s" value="petfinder">
+                <label for="caretaker-s">Shelter/Rescue</label>
+            </div>
+        </div>
     </form>
 
     <p id="js-error-message" class="error-message"></p>
 
-    <section id="results" class="hidden">
+    <main id="results" class="hidden">
         <h2>Search results</h2>
         <p id="results-pagination"></p>
-        <ul id="results-list">
-        </ul>
-    </section>
+        <section>
+            <ul id="results-list">
+            </ul>
+        </section>
+        
+    </main>
     
 </body>
 </html>

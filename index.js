@@ -78,17 +78,15 @@ const api = {
 function displayDetails( petId, petIndex ) {
     let dog = api.results[petIndex];
     $(`#${petId} table`).html(`
-        <tr><th>Breed<th><td>${dog.breed}<td><tr>
-        <tr><th>Gender<th><td>${dog.gender}<td><tr>
-        <tr><th>Age<th><td>${dog.age}<td><tr>
-        <tr><th>Size<th><td>${dog.size}<td><tr>
-        <tr><th>Good With<th><td>${dog.goodWith}<td><tr>
-        <tr><th>Story<th><td>${dog.story}<td><tr>
-        <tr><th>Caretaker<th><td>${dog.caretaker[0]}<td><tr>
-        <tr><th>City, State<th><td>${dog.cityState}<td><tr>
-        <tr><th>More about ${dog.name}<th><td><a href="${dog.url}" target="_blank">Click Here</a><td><tr>
-        
-        `
+        <tr><th>Breed</th><td>${dog.breed}</td></tr>
+        <tr><th>Gender</th><td>${dog.gender}</td></tr>
+        <tr><th>Age</th><td>${dog.age}</td></tr>
+        <tr><th>Size</th><td>${dog.size}</td></tr>
+        <tr><th>Good With</th><td>${dog.goodWith}</td></tr>
+        <tr><th>Story</th><td>${dog.story}</td></tr>
+        <tr><th>Caretaker</th><td>${dog.caretaker[0]}</td></tr>
+        <tr><th>City, State</th><td>${dog.cityState}</td></tr>
+        <tr><th>More about ${dog.name}</th><td><a href="${dog.url}" target="_blank">Click Here</a></td></tr>`
     );
 }
 
@@ -294,6 +292,15 @@ function readCaretaker() {
     }
 }
 
+// Read user input on Distance filter
+function readDistance() {
+    const distanceInput = $(".js-distance").val();
+    if( distanceInput ) {
+        api.getYourPet.search.params.SearchRadiusInMiles = distanceInput;
+        api.petfinder.searchParams.distance = distanceInput;
+    }
+}
+
 // Read user input on Gender filter
 function readGender() {
     const genderInput = [];
@@ -364,6 +371,7 @@ function readFilters() {
     cleanFilters();
     readAge();
     readCaretaker();
+    readDistance();
     readGender();
     readSize();
     readZipCode();
