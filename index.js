@@ -167,23 +167,23 @@ function getPetDetails( id, source ){
 function displayResults() {
     // if there are previous results, remove them
     console.log(api.results);
-    $("#results-list").empty();
+    $("#js-results-list").empty();
 
     //iterate through the items array
     for (let i = 0; i < api.results.length; i++) {
-        $("#results-list").append(
+        $("#js-results-list").append(
             `<li id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
                 <a onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" href="javascript:void(0);">
                     <h3>${api.results[i].name}</h3>
                 </a>
-                <img src='${api.results[i].photoURL}' alt='Picture of ${api.results[i].name}'>
+                <img class="dogImage" src="${api.results[i].photoURL}" alt="Picture of ${api.results[i].name}">
                 <table></table>
             </li>`
         );
     }
 
     //display the results section
-    $("#results").removeClass("hidden");
+    $("#js-results").removeClass("hidden");
     $(".additionalSearch").removeClass("hidden");
 }
 
