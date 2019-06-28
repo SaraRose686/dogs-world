@@ -193,6 +193,14 @@ function displayResults() {
     $("#js-results-list").empty();
 
     if(api.results.length > 0) {
+
+
+        $(".js-results-pagination").html(`
+            <button class="prevSubmit" onclick="handlePrevSearch()" ${api.pagination.currentPage > 1 ? "" : "disabled"}>Previous</button>
+            <span class="pagination">Page ${api.pagination.currentPage} of ${api.pagination.totalPages} </span>
+            <button class="nextSubmit" onclick="handleNextSearch()" ${api.pagination.currentPage < api.pagination.totalPages ? "" : "disabled"}>Next</button>
+        `);
+
         //iterate through the items array
         for (let i = 0; i < api.results.length; i++) {
             $("#js-results-list").append(`
@@ -228,6 +236,11 @@ function processPetFinderResults( responseJson ) {
         name: pet.name,
         photoURL: pet.photos[0].medium
     }));
+
+    api.pagination.currentPage = responseJson.data.pagination.current_page;
+    api.pagination.totalPages = responseJson.data.pagination.total_pages;
+    api.pagination.currentCount += responseJson.data.pagination.count_per_page;
+    api.pagination.totalCount += responseJson.data.pagination.current_page;
 }
 
 function processGetYourPetResults( responseJson ) {
@@ -237,6 +250,9 @@ function processGetYourPetResults( responseJson ) {
         name: pet.Name,
         photoURL: pet.PrimaryPhotoUrl
     }));
+
+    api.pagination.currentCount += responseJson.length;
+    api.pagination.totalCount += responseJson.length;
 }
 
 function getPetList() {
@@ -412,7 +428,7 @@ function readFilters() {
     readZipCode();
 }
 
-function watchForm() {
+function handleSearchForm() {
     $(".searchForm").submit(event => {
         event.preventDefault();
         $("#js-error-message").addClass("hidden");
@@ -421,9 +437,18 @@ function watchForm() {
     });
 }
 
-function startDogsWorld() {
-
-    watchForm();
+function handleNextSearch() {
+    $("#js-error-message").addClass("hidden");
+    api.getYourPet.search.params.PageNumber++;
+    api.petfinder.searchParams.page++;
+    getPetList();
 }
 
-$(startDogsWorld);
+function handlePrevSearch() {
+    $("#js-error-message").addClass("hidden");
+    api.getYourPet.search.params.PageNumber--;
+    api.petfinder.searchParams.page--;
+    getPetList();
+}
+
+$(handleSearchForm);

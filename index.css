@@ -56,7 +56,7 @@ body {
 
 header * {
     text-align: center;
-    background-color: rgba(175,110,0,1);
+    background-color: #AF6E00;
     color: #CAFB8A;
     width: fit-content;
     width: -moz-fit-content;
@@ -83,7 +83,9 @@ footer {
     border: 1px solid #5AA000;
 }
 
-.searchSubmit {
+.searchSubmit,
+.prevSubmit,
+.nextSubmit {
     background-color: #A2F438;
     border-radius: 5px;
     padding: 5px;
@@ -151,9 +153,30 @@ input[type="checkbox"]:checked + label {
     color: #CAFB8A;
 }
 
-.searchResults > h2 {
+.searchResults > h2,
+.topPagination {
     margin-top: 0;
+    display: inline-block;
+    text-align: justify;
 }
+
+.searchResults {
+    text-align: justify;
+}
+
+.pagination {
+    margin: 0 10px;
+}
+
+.bottomPagination {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+}
+
+
 
 .dogList {
     padding: 0;
@@ -215,16 +238,11 @@ input[type="checkbox"]:checked + label {
     position: absolute;
     margin: 0;
     padding: 10px;
-    background-color: rgba(175,110,0,1);
+    background-color: #AF6E00;
     border-bottom-right-radius: 10px;
     text-shadow: 6px 6px 9px #0F1B00;
     color: #CAFB8A;
-    width: fit-content;
-    height: fit-content;
-    width: -moz-fit-content;
-    height: -moz-fit-content;
-    width: -webkit-fit-content;
-    height: -webkit-fit-content;
+    width: fit-content + 25px;
     -webkit-backface-visibility: hidden;
     -moz-backface-visibility: hidden;
     -o-backface-visibility: hidden;
