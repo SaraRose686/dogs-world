@@ -77,17 +77,18 @@ const api = {
 
 function displayDetails( petId, petIndex ) {
     let dog = api.results[petIndex];
-    $(`#${petId} table`).html(`
-        <tr><th>Breed</th><td>${dog.breed}</td></tr>
-        <tr><th>Gender</th><td>${dog.gender}</td></tr>
-        <tr><th>Age</th><td>${dog.age}</td></tr>
-        <tr><th>Size</th><td>${dog.size}</td></tr>
-        <tr><th>Good With</th><td>${dog.goodWith}</td></tr>
-        <tr><th>Story</th><td>${dog.story}</td></tr>
-        <tr><th>Caretaker</th><td>${dog.caretaker[0]}</td></tr>
-        <tr><th>City, State</th><td>${dog.cityState}</td></tr>
-        <tr><th>More about ${dog.name}</th><td><a href="${dog.url}" target="_blank">Click Here</a></td></tr>`
+    $(`#${petId} .dogInfo`).html(`
+        <h3 class="dogName">${dog.name}</h3>
+        <p>
+        <strong>${dog.breed} | ${dog.gender} <br> ${dog.size} | ${dog.age}</strong><br>
+        <strong>Good With:</strong> ${dog.goodWith}<br>
+        <strong>Story:</strong> ${dog.story}<br>
+        <strong>Caretaker:</strong> ${dog.caretaker[0]}<br>
+        <strong>City, State:</strong> ${dog.cityState}<br>
+        <a href="${dog.url}" target="_blank">More about ${dog.name}</a></p>`
     );
+    $(`#${petId} .dogCard`).addClass('flipped');
+
 }
 
 function processPetFinderDetails( responseJson ) {
@@ -112,17 +113,19 @@ function processPetFinderDetails( responseJson ) {
     dog.goodWith = goodWithList.join(", ");
     dog.story = pet.description; 
     dog.url = pet.url;
+    dog.htmlId = dog.id + '_' + dog.caretaker[1];
+    dog.displayDetails = true;
     
     console.log(pet);
     console.log(dog);
-    displayDetails( dog.id + '_' + dog.caretaker[1], petIndex );
+    displayDetails( dog.htmlId, petIndex );
 }
 
 function processGetYourPetDetails( pet ) {
     const petIndex = api.results.findIndex( dog => dog.id === pet.PetId );
     let dog = api.results[petIndex];
     dog.breed = pet.BreedsForDisplay;
-    dog.gender = pet.Gender;
+    dog.gender = pet.Gender === "male" ? "Male" : "Female";
     dog.age = pet.AgeYears === 0 ? dogOptions.age.puppy : 
             ( pet.AgeYears === 1 ? dogOptions.age.young : 
             ( pet.AgeYears > 6 ? dogOptions.age.senior : dogOptions.age.adult ) );
@@ -131,36 +134,56 @@ function processGetYourPetDetails( pet ) {
             ( pet.Size === "xl (over 75lbs.)" ? dogOptions.size.xlarge : dogOptions.size.large ) );
     dog.cityState = pet.City + ", " + pet.State;
     dog.goodWith = pet.GoodWith.join(", ");
-    dog.story = pet.Story;
+    dog.story = pet.Story.length > 150 ? pet.Story.slice(0, 149).padEnd(152,".") : pet.Story;
     dog.url = pet.ProfileUrl;
+    dog.htmlId = dog.id + '_' + dog.caretaker[1];
+    dog.displayDetails = true;
     
     console.log(pet);
     console.log(dog);
-    displayDetails( dog.id + '_' + dog.caretaker[1], petIndex );
+    displayDetails( dog.htmlId, petIndex );
 }
 
 function getPetDetails( id, source ){
-    if( source === dogOptions.caretaker.getYourPet[1] ) {
-        const url = api.getYourPet.search.url + "/" + id + "?" + 
-            "zipCode=" + api.getYourPet.search.params.ZipCode;
-        fetch(url)
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error(response.statusText);
-            })
-            .then(responseJson => processGetYourPetDetails(responseJson))
-            .catch(err => {
-                $("#js-error-message").text(`Something went wrong: ${err.message}`);
-        });
+    const petIndex = api.results.findIndex( dog => dog.id === id );
+    let dogResult = api.results[petIndex];
+    
+    // Check whether results are already displaying
+    if( dogResult.displayDetails === undefined ) {
+        if( source === dogOptions.caretaker.getYourPet[1] ) {
+            const url = api.getYourPet.search.url + "/" + id + "?" + 
+                "zipCode=" + api.getYourPet.search.params.ZipCode;
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(response.statusText);
+                })
+                .then(responseJson => processGetYourPetDetails(responseJson))
+                .catch(err => {
+                    $("#js-error-message").text(`Something went wrong: ${err.message}`);
+                    $("#js-error-message").removeClass("hidden");
+            });
+        }
+        else if( source === dogOptions.caretaker.petfinder[1] ) {
+            api.petfinder.client.animal.show(id)
+                .then(responseJson => processPetFinderDetails(responseJson))
+                .catch(err => {
+                    $("#js-error-message").text(`Something went wrong: ${err.message}`);
+                    $("#js-error-message").removeClass("hidden");
+            });
+        }
     }
-    else if( source === dogOptions.caretaker.petfinder[1] ) {
-        api.petfinder.client.animal.show(id)
-            .then(responseJson => processPetFinderDetails(responseJson))
-            .catch(err => {
-                $("#js-error-message").text(`Something went wrong: ${err.message}`);
-        });
+    if( dogResult.displayDetails ) {
+        dogResult.displayDetails = false;
+        $(`#${dogResult.htmlId} p`).empty();
+        $(`#${dogResult.htmlId} > .dogCard`).removeClass('flipped');
+
+    }
+    else {
+        dogResult.displayDetails = true;
+        displayDetails(dogResult.htmlId, petIndex);
     }
 }
 
@@ -169,19 +192,30 @@ function displayResults() {
     console.log(api.results);
     $("#js-results-list").empty();
 
-    //iterate through the items array
-    for (let i = 0; i < api.results.length; i++) {
-        $("#js-results-list").append(
-            `<li id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
-                <a onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" href="javascript:void(0);">
-                    <h3>${api.results[i].name}</h3>
-                </a>
-                <img class="dogImage" src="${api.results[i].photoURL}" alt="Picture of ${api.results[i].name}">
-                <table></table>
-            </li>`
+    if(api.results.length > 0) {
+        //iterate through the items array
+        for (let i = 0; i < api.results.length; i++) {
+            $("#js-results-list").append(`
+                <li class="dogItem" id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
+                    <div class="dogCard">
+                        <div class="dogLink" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" >
+                            <h3 class="dogName">${api.results[i].name}</h3>
+                            <img class="dogImage" src="${api.results[i].photoURL}" alt="Picture of ${api.results[i].name}">
+                        </div>
+                        <div class="dogInfo" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');"></div>
+                    </div>
+                </li>`
+            );
+        }
+    }
+    else {
+        $("#js-results-list").append(`
+            <p>
+                No results found. Please adjust your search.
+            </p>`
         );
     }
-
+    
     //display the results section
     $("#js-results").removeClass("hidden");
     $(".additionalSearch").removeClass("hidden");
@@ -234,6 +268,7 @@ function getPetList() {
         .then( () => displayResults())
         .catch(err => {
             $("#js-error-message").text(`Something went wrong: ${err.message}`);
+            $("#js-error-message").removeClass("hidden");
         });
 }
 
@@ -380,15 +415,15 @@ function readFilters() {
 function watchForm() {
     $(".searchForm").submit(event => {
         event.preventDefault();
+        $("#js-error-message").addClass("hidden");
         readFilters();
         getPetList();
     });
 }
 
 function startDogsWorld() {
-   
-    watchForm();
 
+    watchForm();
 }
 
 $(startDogsWorld);
