@@ -165,6 +165,7 @@ input[type="checkbox"]:checked + label {
     -o-transform-style: preserve-3d;
     transform-style: preserve-3d;
     -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
 }
 
 /* common card face features */

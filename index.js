@@ -85,7 +85,7 @@ function displayDetails( petId, petIndex ) {
         ${dog.story ? "<strong>Story: </strong>" + dog.story + "<br>" : "" }
         <strong>Caretaker: </strong>${dog.caretaker[0]}<br>
         <strong>City, State: </strong>${dog.cityState}<br>
-        <a href="${dog.url}" target="_blank">More about ${dog.name}</a></p>`
+        <a><a href="${dog.url}" target="_blank">More about ${dog.name}</a></a></p>`
     );
     $(`#${petId} .dogCard`).addClass('flipped');
 }
@@ -172,13 +172,12 @@ function getPetDetails( id, source ){
     }
     if( dogResult.displayDetails ) {
         dogResult.displayDetails = false;
-        $(`#${dogResult.htmlId} p`).empty();
         $(`#${dogResult.htmlId} > .dogCard`).removeClass('flipped');
 
     }
     else {
         dogResult.displayDetails = true;
-        displayDetails(dogResult.htmlId, petIndex);
+        $(`#${dogResult.htmlId} > .dogCard`).addClass('flipped');
     }
 }
 
