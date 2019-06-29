@@ -1,5 +1,6 @@
 "use strict";
 
+/* Filter options used to display and map to API */
 const dogOptions = {
     age: {
         puppy: "Puppy (under 1 year old)",
@@ -30,13 +31,12 @@ const dogOptions = {
     }
 };
 
+/* API details */
 const api = {
     results: [],
     pagination: {
         totalPages: 1,
-        currentPage: 1,
-        totalCount: 0,
-        currentCount: 0
+        currentPage: 1
     },
     petfinder: {
         displaySearch: true,
@@ -81,14 +81,13 @@ function displayDetails( petId, petIndex ) {
         <h3 class="dogName">${dog.name}</h3>
         <p>
         <strong>${dog.breed} | ${dog.gender} <br> ${dog.size} | ${dog.age}</strong><br>
-        <strong>Good With:</strong> ${dog.goodWith}<br>
-        <strong>Story:</strong> ${dog.story}<br>
-        <strong>Caretaker:</strong> ${dog.caretaker[0]}<br>
-        <strong>City, State:</strong> ${dog.cityState}<br>
+        ${dog.goodWith ? "<strong>Good With: </strong>" + dog.goodWith + "<br>" : "" }
+        ${dog.story ? "<strong>Story: </strong>" + dog.story + "<br>" : "" }
+        <strong>Caretaker: </strong>${dog.caretaker[0]}<br>
+        <strong>City, State: </strong>${dog.cityState}<br>
         <a href="${dog.url}" target="_blank">More about ${dog.name}</a></p>`
     );
     $(`#${petId} .dogCard`).addClass('flipped');
-
 }
 
 function processPetFinderDetails( responseJson ) {
@@ -116,8 +115,6 @@ function processPetFinderDetails( responseJson ) {
     dog.htmlId = dog.id + '_' + dog.caretaker[1];
     dog.displayDetails = true;
     
-    console.log(pet);
-    console.log(dog);
     displayDetails( dog.htmlId, petIndex );
 }
 
@@ -139,8 +136,6 @@ function processGetYourPetDetails( pet ) {
     dog.htmlId = dog.id + '_' + dog.caretaker[1];
     dog.displayDetails = true;
     
-    console.log(pet);
-    console.log(dog);
     displayDetails( dog.htmlId, petIndex );
 }
 
@@ -148,7 +143,7 @@ function getPetDetails( id, source ){
     const petIndex = api.results.findIndex( dog => dog.id === id );
     let dogResult = api.results[petIndex];
     
-    // Check whether results are already displaying
+    // Check whether results are already stored
     if( dogResult.displayDetails === undefined ) {
         if( source === dogOptions.caretaker.getYourPet[1] ) {
             const url = api.getYourPet.search.url + "/" + id + "?" + 
@@ -189,28 +184,27 @@ function getPetDetails( id, source ){
 
 function displayResults() {
     // if there are previous results, remove them
-    console.log(api.results);
+    $(".js-results-pagination").empty();
     $("#js-results-list").empty();
 
     if(api.results.length > 0) {
-
-
+        // Update pagination
         $(".js-results-pagination").html(`
-            <button class="prevSubmit" onclick="handlePrevSearch()" ${api.pagination.currentPage > 1 ? "" : "disabled"}>Previous</button>
-            <span class="pagination">Page ${api.pagination.currentPage} of ${api.pagination.totalPages} </span>
-            <button class="nextSubmit" onclick="handleNextSearch()" ${api.pagination.currentPage < api.pagination.totalPages ? "" : "disabled"}>Next</button>
+            <button class="prevSubmit" aria-label="Previous" onclick="handlePrevSearch()" ${api.pagination.currentPage > 1 ? "" : "disabled"}>< Previous</button>
+            <span class="pages">Page ${api.pagination.currentPage} of ${api.pagination.totalPages} </span>
+            <button class="nextSubmit" aria-label="Next" onclick="handleNextSearch()" ${api.pagination.currentPage < api.pagination.totalPages ? "" : "disabled"}>Next ></button>
         `);
 
         //iterate through the items array
         for (let i = 0; i < api.results.length; i++) {
             $("#js-results-list").append(`
-                <li class="dogItem" id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
-                    <div class="dogCard">
-                        <div class="dogLink" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" >
-                            <h3 class="dogName">${api.results[i].name}</h3>
+                <li class="dogItem" aria-live="polite" id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
+                    <div role="none" class="dogCard">
+                        <div role="none" class="dogLink" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" >
+                            <h3 tabindex="0" class="dogName">${api.results[i].name}</h3>
                             <img class="dogImage" src="${api.results[i].photoURL}" alt="Picture of ${api.results[i].name}">
                         </div>
-                        <div class="dogInfo" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');"></div>
+                        <div role="none" class="dogInfo" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');"></div>
                     </div>
                 </li>`
             );
@@ -218,15 +212,15 @@ function displayResults() {
     }
     else {
         $("#js-results-list").append(`
-            <p>
-                No results found. Please adjust your search.
-            </p>`
+            <h3>No results found. Please adjust your search.</h3>`
         );
     }
     
     //display the results section
     $("#js-results").removeClass("hidden");
     $(".additionalSearch").removeClass("hidden");
+    $(".searchSubmit").val("Search");
+    $(".searchSubmit").prop("disabled", false);
 }
 
 function processPetFinderResults( responseJson ) {
@@ -234,13 +228,12 @@ function processPetFinderResults( responseJson ) {
         caretaker: dogOptions.caretaker.petfinder,
         id: pet.id,
         name: pet.name,
-        photoURL: pet.photos[0].medium
+        photoURL: pet.photos.length > 0 ? pet.photos[0].large : "https://www.rspcansw.org.au/wp-content/themes/noPhotoFound.png"
     }));
 
+    // Allow pagination for Petfinder results
     api.pagination.currentPage = responseJson.data.pagination.current_page;
     api.pagination.totalPages = responseJson.data.pagination.total_pages;
-    api.pagination.currentCount += responseJson.data.pagination.count_per_page;
-    api.pagination.totalCount += responseJson.data.pagination.current_page;
 }
 
 function processGetYourPetResults( responseJson ) {
@@ -251,8 +244,11 @@ function processGetYourPetResults( responseJson ) {
         photoURL: pet.PrimaryPhotoUrl
     }));
 
-    api.pagination.currentCount += responseJson.length;
-    api.pagination.totalCount += responseJson.length;
+    // Only allow 1 page if only displaying GetYourPet results
+    if(! api.petfinder.displaySearch ) {
+        api.pagination.currentPage = 1;
+        api.pagination.totalPages = 1;
+    }
 }
 
 function getPetList() {
@@ -272,6 +268,7 @@ function getPetList() {
             throw new Error(response.statusText);
         });
 
+    // Don't display results until both APIs have returned
     Promise.all([ getYourPetRequest, petfinderRequest ])
         .then( responses => {
             if( api.getYourPet.displaySearch ) {
@@ -299,8 +296,9 @@ function cleanFilters() {
     delete api.petfinder.searchParams.size;
     delete api.getYourPet.search.params.SizeMin;
     delete api.getYourPet.search.params.SizeMax;
+    api.getYourPet.search.params.PageNumber = 1;
+    api.petfinder.searchParams.page = 1;
 }
-
 
 // Read user input on Age filter
 function readAge() {
@@ -432,6 +430,8 @@ function handleSearchForm() {
     $(".searchForm").submit(event => {
         event.preventDefault();
         $("#js-error-message").addClass("hidden");
+        $(".searchSubmit").val("Searching...");
+        $(".searchSubmit").prop("disabled", true);
         readFilters();
         getPetList();
     });
@@ -451,4 +451,44 @@ function handlePrevSearch() {
     getPetList();
 }
 
-$(handleSearchForm);
+// Customization is necessary since checkboxes are not navigable.
+// Also handles flipping card for accessibility
+function handleKeyCommands() {
+    $(document).keydown( event => {
+        const keycode = (event.key ? event.key : event.which);
+        // Selecting options in search form
+        let focusedLabel = $(".js-option:focus");
+        const prevInput = focusedLabel.prev("input[type='checkbox']");
+        if( prevInput.val() != null ) {
+            switch(keycode) {
+                case "Enter":
+                case " ":
+                    // Select the current answer
+                    prevInput.prop( "checked", ( i, val ) => !val );
+                    break;
+                default:
+            }
+        }
+        else {
+            focusedLabel = $(".dogName:focus");
+            if(focusedLabel) {
+                switch(keycode) {
+                    case "Enter":
+                    case " ":
+                        focusedLabel.parent().trigger("click");
+                        break;
+                    default:
+                }
+            }
+        }
+    }); 
+}
+
+function runDogsWorld() {
+    handleSearchForm();
+    handleKeyCommands()
+}
+
+$(runDogsWorld);
+
+
