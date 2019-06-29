@@ -85,7 +85,7 @@ function displayDetails( petId, petIndex ) {
         ${dog.story ? "<strong>Story: </strong>" + dog.story + "<br>" : "" }
         <strong>Caretaker: </strong>${dog.caretaker[0]}<br>
         <strong>City, State: </strong>${dog.cityState}<br>
-        <a><a href="${dog.url}" target="_blank">More about ${dog.name}</a></a></p>`
+        <strong><a href="${dog.url}" target="_blank">More about ${dog.name}</a></strong></p>`
     );
     $(`#${petId} .dogCard`).addClass('flipped');
 }
