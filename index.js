@@ -198,10 +198,10 @@ function displayResults() {
         //iterate through the items array
         for (let i = 0; i < api.results.length; i++) {
             $("#js-results-list").append(`
-                <li class="dogItem" aria-live="polite" id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
+                <li class="dogItem" aria-labelledby="${api.results[i].id}Name" aria-live="polite" id='${api.results[i].id}_${api.results[i].caretaker[1]}'>
                     <div role="none" class="dogCard">
                         <div role="none" class="dogLink" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');" >
-                            <h3 tabindex="0" class="dogName">${api.results[i].name}</h3>
+                            <h3 tabindex="0" id="${api.results[i].id}Name" class="dogName">${api.results[i].name}</h3>
                             <img class="dogImage" src="${api.results[i].photoURL}" alt="Picture of ${api.results[i].name}">
                         </div>
                         <div role="none" class="dogInfo" onclick="getPetDetails(${api.results[i].id}, '${api.results[i].caretaker[1]}');"></div>
