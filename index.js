@@ -218,8 +218,6 @@ function displayResults() {
     //display the results section
     $("#js-results").removeClass("hidden");
     $(".additionalSearch").removeClass("hidden");
-    $(".searchSubmit").val("Search");
-    $(".searchSubmit").prop("disabled", false);
 }
 
 function processPetFinderResults( responseJson ) {
@@ -281,6 +279,10 @@ function getPetList() {
         .catch(err => {
             $("#js-error-message").text(`Something went wrong: ${err.message}`);
             $("#js-error-message").removeClass("hidden");
+        })
+        .finally( () => {
+            $(".searchSubmit").val("Search");
+            $(".searchSubmit").prop("disabled", false);
         });
 }
 
@@ -357,7 +359,9 @@ function readGender() {
     } );
     if( genderInput.length > 0 ) {
         api.petfinder.searchParams.gender = genderInput.join();
-        api.getYourPet.search.params.Gender = genderInput.join();
+        if( genderInput.length === 1) {
+            api.getYourPet.search.params.Gender = genderInput.join();
+        }
     }
     
 }
@@ -441,6 +445,9 @@ function handleNextSearch() {
     api.getYourPet.search.params.PageNumber++;
     api.petfinder.searchParams.page++;
     getPetList();
+    $('html, body').animate( { 
+        scrollTop: $("#js-results").offset().top
+    }, 500, 'linear');
 }
 
 function handlePrevSearch() {
@@ -448,6 +455,9 @@ function handlePrevSearch() {
     api.getYourPet.search.params.PageNumber--;
     api.petfinder.searchParams.page--;
     getPetList();
+    $('html, body').animate( { 
+        scrollTop: $("#js-results").offset().top
+    }, 500, 'linear');
 }
 
 // Customization is necessary since checkboxes are not navigable.
