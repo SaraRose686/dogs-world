@@ -9,7 +9,24 @@ body {
     background-size: 250px;
     color: #1D1200;
     min-width: 365px;
-    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#pageContainer {
+    min-height: 100vh;
+    position: relative;
+}
+
+#mainContainer {
+    padding-bottom: 9em;
+}
+
+#footerContainer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 9em;
 }
 
 header * {
@@ -237,8 +254,8 @@ footer > * {
 
 footer img,
 footer svg {
-    height: 25px;
-    margin: 5px;
+    height: 20px;
+    margin: 3px;
 }
 
 .error-message {
@@ -325,8 +342,8 @@ footer svg {
 
     footer img,
     footer svg {
-        height: 35px;
-        margin: 5px;
+        height: 40px;
+        margin: 10px;
     }
 }
 
