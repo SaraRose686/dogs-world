@@ -130,7 +130,7 @@ function processGetYourPetDetails( pet ) {
             ( pet.Size === "m (21lbs. to 40lbs.)" ? dogOptions.size.medium : 
             ( pet.Size === "xl (over 75lbs.)" ? dogOptions.size.xlarge : dogOptions.size.large ) );
     dog.cityState = pet.City + ", " + pet.State;
-    dog.goodWith = pet.GoodWith.join(", ");
+    dog.goodWith = pet.GoodWith ? (pet.GoodWith.join(", ")) : null;
     dog.story = pet.Story.length > 150 ? pet.Story.slice(0, 149).padEnd(152,".") : pet.Story;
     dog.url = pet.ProfileUrl;
     dog.htmlId = dog.id + '_' + dog.caretaker[1];
